@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>醫師</title>
+    <link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/util.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/main.css') }}">
+    <style>
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+ 
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+ 
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+ 
+        .container {
+            max-width: 95%;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+ 
+        .header h1 {
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            color: #333;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+ 
+        .data-table-container {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+ 
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+ 
+        .data-table th, .data-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+            animation: fadeIn 1s ease-in-out;
+        }
+ 
+        .data-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+ 
+        .data-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+ 
+        .data-table tr:hover {
+            background-color: #e9ecef;
+        }
+ 
+        .data-table button {
+            padding: 10px 20px;
+            background-color: #183f2d;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+ 
+        .data-table button:hover {
+            background-color: #145a32;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+ 
+        .data-table button:active {
+            background-color: #123524;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+        }
+ 
+        .form-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            overflow: auto;
+            max-height: 90vh;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+ 
+        .form-popup h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+ 
+        .form-group {
+            margin-bottom: 15px;
+        }
+ 
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+ 
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+ 
+        .form-group textarea {
+            resize: vertical;
+        }
+ 
+        .btn-container {
+            text-align: right;
+        }
+ 
+        .btn-container button {
+            padding: 10px 20px;
+            margin-left: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+ 
+        .btn-container button:first-child {
+            background-color: #28a745;
+            color: #fff;
+        }
+ 
+        .btn-container button:first-child:hover {
+            background-color: #218838;
+        }
+ 
+        .btn-container button.close-btn {
+            background-color: #dc3545;
+            color: #fff;
+        }
+ 
+        .btn-container button.close-btn:hover {
+            background-color: #c82333;
+        }
+ 
+        .btn-container .back-button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+ 
+        .btn-container .back-button:hover {
+            background-color: #0056b3;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+ 
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+ 
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        
+        .login-container, .container {
+            display: none;
+            max-width: 95%;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+ 
+        .login-container.active, .container.active {
+            display: block;
+        }
+ 
+        .header h1 {
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            color: #333;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+ 
+        .login-form {
+            max-width: 400px;
+            margin: auto;
+        }
+ 
+        .login-form .form-group {
+            margin-bottom: 15px;
+        }
+ 
+        .login-form .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+ 
+        .login-form .form-group input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+ 
+        .login-form .form-group button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+ 
+        .login-form .form-group button:hover {
+            background-color: #218838;
+        }
+ 
+        .data-table-container {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+ 
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+ 
+        .data-table th, .data-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+            animation: fadeIn 1s ease-in-out;
+        }
+ 
+        .data-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+ 
+        .data-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+ 
+        .data-table tr:hover {
+            background-color: #e9ecef;
+        }
+ 
+        .data-table button {
+            padding: 10px 20px;
+            background-color: #183f2d;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+ 
+        .data-table button:hover {
+            background-color: #145a32;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+ 
+        .data-table button:active {
+            background-color: #123524;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+        }
+ 
+        .form-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            overflow: auto;
+            max-height: 90vh;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+ 
+        .form-popup h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+ 
+        .form-group {
+            margin-bottom: 15px;
+        }
+ 
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+ 
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+ 
+        .form-group textarea {
+            resize: vertical;
+        }
+ 
+        .btn-container {
+            text-align: right;
+        }
+ 
+        .btn-container button {
+            padding: 10px 20px;
+            margin-left: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+ 
+        .btn-container button:first-child {
+            background-color: #28a745;
+            color: #fff;
+        }
+ 
+        .btn-container button:first-child:hover {
+            background-color: #218838;
+        }
+ 
+        .btn-container button.close-btn {
+            background-color: #dc3545;
+            color: #fff;
+        }
+ 
+        .btn-container button.close-btn:hover {
+            background-color: #c82333;
+        }
+ 
+        .btn-container .back-button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+ 
+        .btn-container .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* #emptyCell1,
+        #emptyCell2,
+        #emptyCell3 {
+            display: none;
+        } */
+    </style>
+</head>
+<body>
+    <div class="login-container active">
+        <div class="container-login100">
+            <div class="wrap-login100">
+                <div class="login100-form-title">
+                    <span class="login100-form-title-1">醫師登錄</span>
+                </div>
+                <form class="login100-form validate-form" id="loginForm">
+                    <div class="wrap-input100 validate-input m-b-26" data-validate="帳號不能空白">
+                        <span class="label-input100" for="username">帳號</span>
+                        <input class="input100" type="text" id="username" placeholder="請輸入帳號" required>
+                        <span class="focus-input100"></span>
+                    </div>
+                    <div class="wrap-input100 validate-input m-b-18" data-validate="密碼不能空白">
+                        <span class="label-input100" for="password">密碼</span>
+                        <input class="input100" type="password" id="password" placeholder="請輸入密碼" required>
+                        <span class="focus-input100"></span>
+                    </div>
+                    
+                    <div class="container-login100-form-btn">
+                        <button class="login100-form-btn" type="button" onclick="login()">登 入</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+</body>  
+<div class="container">
+    <div class="header">
+        <h1>歷史辨識結果</h1>
+        <p style="text-align: center;">辨識照片非100%準確，請醫師依照自己的意見做診斷!!</p>
+    </div>
+    <div class="data-table-container">
+        <h2>待協助案例</h2>
+        <table class="data-table" id="pendingTable">
+            <thead>
+                <tr>
+                    <th>辨識到的照片</th>
+                    <!-- <th>舌象</th>
+                    <th>建議或改善</th>
+                    <th>填寫時間</th> -->
+
+                    <!-- <th>舌象</th> -->
+                    <!-- <th>建議或改善</th> -->
+                    <!-- <th>填寫時間</th> -->
+                    <th>操作</th>
+
+                </tr>
+            </thead>
+            <tbody id="pendingTableBody">
+                {% for img_path in tongue_images.tongue_yolo_img %} <!-- 改 tongue_original_img OR tongue_yolo_img -->
+                    <tr>
+                        <td><img src="{{ img_path }}" alt="Detected Tongue Image" style="width: 100px; height: auto;"></td>
+                        <td><button type="button" onclick="openForm('{{ img_path }}', this)">進行診斷</button></td>
+                        <td id="emptyCell1"></td>
+                        <td id="emptyCell2"></td>
+                        <td id="emptyCell3"></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>已協助案例</h2>
+        <table class="data-table" id="completedTable">
+            <thead>
+                <tr>
+                    <th>辨識到的照片</th>
+                    <th>舌象</th>
+                    <th>建議或改善</th>
+                    <th>填寫時間</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="completedTableBody">
+                <!-- 已完成的資料將會顯示在這裡 -->
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="form-popup" id="formPopup">
+    <form id="selectionForm">
+        <h2>辨識報告</h2>
+        <div class="form-group">
+            <img id="detectedImage" src="" alt="Detected Tongue Image" style="width: 100%; height: auto;">
+            <input type="hidden" id="hospitalName" name="hospitalName">
+            <input type="hidden" id="doctorName" name="doctorName">
+            <input type="hidden" id="imgPath" name="imgPath">
+            <input type="hidden" id="rowIndex" name="rowIndex">
+        </div>
+        <div class="form-group">
+            <label for="tongueType">舌象</label>
+            <select id="tongueType" name="tongueType" required>
+                <option value="健康舌象">健康舌象</option>
+                <option value="陽虛舌象">陽虛舌象</option>
+                <option value="氣虛舌象">氣虛舌象</option>
+                <option value="陰虛舌象">陰虛舌象</option>
+                <option value="濕熱舌象">濕熱舌象</option>
+                <option value="其他">其他</option> <!-- 補充舌象 -->
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="suggestions">建議或改善</label>
+            <textarea id="suggestions" name="suggestions" rows="4" ></textarea>
+        </div>
+        <div class="btn-container">
+            <button type="submit">提交</button>
+            <button type="button" class="close-btn" onclick="closeForm()">取消</button>
+        </div>
+    </form>
+</div>
+
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/main.js"></script>
+
+
+<!-- 20240913 new2 use it -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const json_path_docSide = "./static/dist/json/doctorSide_list.json";
+
+        // 使用 fetch API 讀取 JSON 檔案
+        fetch(json_path_docSide)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                populateCompletedTable(data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+
+        // 將讀取到的數據插入到已協助案例表格中
+        function populateCompletedTable(data) {
+            const completedTableBody = document.getElementById("completedTableBody");
+
+            data.forEach(caseData => {
+                const row = document.createElement("tr");
+
+                // 插入每個欄位的資料
+                row.innerHTML = `
+                    <td><img src="${caseData.imgPath}" alt="Detected Tongue Image" style="width: 100px; height: auto;"></td>
+                    <td>${caseData.tongueType}</td>
+                    <td>${caseData.suggestions}</td>
+                    <td>${caseData.timestamp}</td>
+                    <td><button type="button" onclick="openFormForEdit(this)">編輯</button></td>
+                `;
+
+                // 添加該行到表格
+                completedTableBody.appendChild(row);
+            });
+        }
+    });
+</script>
+
+
+
+<script>
+    const accounts = {
+        '0000': { hospital: '台北榮總醫院', doctor: '李醫師', password: '0000' },
+        '1234': { hospital: '台中榮總醫院', doctor: '王醫師', password: '1234' },
+        '0001': { hospital: '仁愛中醫診所', doctor: '林醫師', password: '0001' },
+        '0002': { hospital: '六節中醫診所', doctor: '楊醫師', password: '0002' },
+        '0003': { hospital: '天心中醫診所', doctor: '溫醫師', password: '0003' },
+        '0004': { hospital: '汀洲中醫診所', doctor: '王醫師', password: '0004' },
+        '0005': { hospital: '天心中醫診所', doctor: '林醫師', password: '0005' }
+        // 這裡可以添加更多帳號和對應的醫院、醫師資料
+    };
+
+    function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        if (accounts[username] && accounts[username].password === password) {
+            document.querySelector('.login-container').classList.remove('active');
+            document.querySelector('.container').classList.add('active');
+
+            // 更新表格標題為醫院名稱和醫師名稱
+            const hospital = accounts[username].hospital;
+            const doctor = accounts[username].doctor;
+
+            // 保存醫院名稱和醫師名稱到localStorage
+            localStorage.setItem('currentHospitalName', hospital);
+            localStorage.setItem('currentDoctorName', doctor);
+            localStorage.setItem('isLoggedIn', 'true'); // 保存登入狀態
+
+            alert(`歡迎 ${hospital} ${doctor}`);
+        } else {
+            alert('帳號或密碼錯誤');
+        }
+    }
+
+    function openForm(imgPath, buttonElement) {
+        document.getElementById('detectedImage').src = imgPath;
+        document.getElementById('imgPath').value = imgPath;
+
+        document.getElementById('hospitalName').value = getCurrentHospitalName();
+        document.getElementById('doctorName').value = getCurrentDoctorName();
+
+        document.getElementById('formPopup').style.display = 'block';
+        openForm.currentButton = buttonElement;
+        openForm.isEditing = false;
+
+        const row = buttonElement.closest('tr');
+        const lastCell = row.lastElementChild;
+        if (!lastCell.querySelector('button:nth-child(2)')) {
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = '刪除資料';
+            deleteButton.onclick = function() { deleteData(this); };
+            deleteButton.style.marginLeft = '10px';
+            lastCell.appendChild(deleteButton);
+        }
+    }
+
+    function openFormForEdit(buttonElement) {
+        const row = buttonElement.closest('tr');
+        const imgSrc = row.querySelector('img').src;
+        const tongueType = row.children[1].textContent;
+        const suggestions = row.children[2].textContent;
+
+        document.getElementById('detectedImage').src = imgSrc;
+        document.getElementById('imgPath').value = imgSrc;
+        document.getElementById('tongueType').value = tongueType;
+        document.getElementById('suggestions').value = suggestions;
+
+        document.getElementById('formPopup').style.display = 'block';
+        openForm.currentButton = buttonElement;
+        openForm.isEditing = true;
+    }
+
+    function getCurrentHospitalName() {
+        return localStorage.getItem('currentHospitalName') || '台北榮總醫院';
+    }
+
+    function getCurrentDoctorName() {
+        return localStorage.getItem('currentDoctorName') || '李醫生';
+    }
+
+    function closeForm() {
+        document.getElementById('formPopup').style.display = 'none';
+    }
+
+    // debug 提交表單 - 20240913
+    document.getElementById('selectionForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        var formData = new FormData(this);
+
+        // 添加時間戳
+       formData.append('timestamp', new Date().toLocaleString());
+
+        fetch('/submit-form', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('報告已提交！');
+                closeForm();
+
+                // 找到正在編輯的行
+                const row = openForm.currentButton.closest('tr');
+
+                // 將資料更新到已完成的表格
+                const completedTableBody = document.getElementById('completedTableBody');
+                const newRow = row.cloneNode(true);  // 複製整行 
+
+                // bug: 待完成的填好之後已完成的輸出不了
+                newRow.children[1].textContent = formData.get('tongueType'); // 更新舌象
+                newRow.children[2].textContent = formData.get('suggestions'); // 更新建議或改善
+                newRow.children[3].textContent = formData.get('timestamp'); // 更新填寫時間
+                
+
+                // 刪除待完成中的該行
+                row.parentNode.removeChild(row);
+
+                // 修改新行中的按鈕
+                const actionCell = newRow.lastElementChild;
+                actionCell.innerHTML = ''; // 清空單元格內容
+                const editButton = document.createElement('button');
+                editButton.textContent = '編輯報告';
+                editButton.onclick = function() { openFormForEdit(this); };
+                actionCell.appendChild(editButton);
+
+                // 將新行添加到已完成表格
+                completedTableBody.appendChild(newRow);
+
+            } else {
+                alert('提交失敗，請重試。');
+            }
+        })
+        .catch(error => {
+            alert('提交過程中出現錯誤，請重試。');
+            console.error('提交錯誤:', error);
+        });
+    });
+</script>

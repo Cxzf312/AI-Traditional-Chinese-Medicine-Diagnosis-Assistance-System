@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>氣虛舌象介紹</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+            font-size: 22px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            padding: 20px;
+        }
+        .image-container {
+            flex: 1;
+            padding-right: 20px;
+            min-width: 300px;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        .content {
+            flex: 2;
+        }
+        .content h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 36px;
+        }
+        h2 {
+            color: #3498db;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        p, li {
+            font-size: 22px;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 25px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-size: 20px;
+        }
+        .back-button:hover {
+            background-color: #2980b9;
+        }
+        .section {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="image-container">
+            <img src="{{ url_for('static', filename='dist/assets/img/qdbt.png') }}" alt="氣虛舌象圖片">
+        </div>
+        <div class="content">
+            <h1>氣虛舌象</h1>
+            <p>氣虛舌象是中醫診斷中的一種重要舌象，通常表現為以下特徵：</p>
+            <ul>
+                <li>舌質淡</li>
+                <li>舌體偏大或胖嫩</li>
+                <li>舌苔薄白</li>
+                <li>舌邊有齒痕</li>
+            </ul>
+            
+            <h2>舌象解釋</h2>
+            <p>氣虛舌象反映了人體氣血不足的狀態，常見於以下情況：</p>
+            <ul>
+                <li>脾氣虛：食慾不振，消化不良</li>
+                <li>肺氣虛：易感冒，聲音低弱</li>
+                <li>心氣虛：心悸，氣短乏力</li>
+            </ul>
+            
+            <h2>調養方式</h2>
+            <ul>
+                <li><strong>飲食調理：</strong>建議多食用補氣的食物如黃芪、黨參、大棗、白術等。避免生冷食物，以免傷脾胃。</li>
+                <li><strong>運動：</strong>適當的有氧運動，如太極拳、散步，有助於提升氣血循環，增強體力。</li>
+                <li><strong>情志調養：</strong>保持心情舒暢，避免情緒過度波動，以免耗氣傷身。</li>
+                <li><strong>生活作息：</strong>規律作息，早睡早起，避免過度勞累。</li>
+            </ul>
+
+            <h2>注意事項</h2>
+            <ul>
+                <li>注意保持良好的飲食習慣，避免過度勞累。</li>
+                <li>適當保暖，尤其是容易感冒的人。</li>
+                <li>確保充足的休息，避免過度熬夜。</li>
+            </ul>
+
+            <h2>對策與調理</h2>
+            <p>氣虛患者通常會感到疲勞、乏力、氣短等症狀。中醫治療主要以補氣為主，結合飲食調理和適度運動。可以考慮使用補氣中藥或針灸調理。</p>
+            <p><strong>中藥調理：</strong>根據氣虛的具體情況，選用補氣的中藥，如人參湯或四君子湯來調理。</p>
+            <p><strong>針灸：</strong>可考慮針灸來調理氣虛症狀，針刺足三里、氣海等穴位有助於補氣。</p>
+
+            <a href="{{ url_for('result') }}" class="back-button">返回</a>
+        </div>
+    </div>
+</body>
+</html>

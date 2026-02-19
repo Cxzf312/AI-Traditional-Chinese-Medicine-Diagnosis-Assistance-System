@@ -1,0 +1,30 @@
+<!-- 辨識結果頁面 -->
+<!-- 要修改: 老師只想看到最後病症的照片 -->
+<!-- 可以寫兩部分 => result:健康.html 跟  result:不健康.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>辨識結果</title>
+</head>
+<body>
+    <h1>辨識結果</h1>
+    <img src="{{ url_for('static', filename='dist/assets/webcam_pic/1st_raw_detected_tongue.jpg') }}">
+    <img src="{{ url_for('static', filename='dist/assets/webcam_pic/1st_yolo_detected_tongue.jpg') }}">
+
+    <img src="{{ url_for('static', filename='dist/assets/webcam_pic/2nd_raw_detected_tongue.jpg') }}">
+    <img src="{{ url_for('static', filename='dist/assets/webcam_pic/2nd_yolo_detected_tongue.jpg') }}">
+
+    <img src="{{ url_for('static', filename='dist/assets/webcam_pic/3rd_allSymptoms_raw_detected_tongue.jpg') }}">
+    <img src="{{ url_for('static', filename='dist/assets/webcam_pic/3rd_allSymptoms_yolo_detected_tongue.jpg') }}">
+
+    <div class="btn-container">
+        <!-- 按鈕連結到 /result 路由 -->
+        <form action="{{ url_for('index') }}" method="get">
+        <button type="submit">返回主畫面</button>
+        </form>
+    </div>
+
+</body>
+</html>

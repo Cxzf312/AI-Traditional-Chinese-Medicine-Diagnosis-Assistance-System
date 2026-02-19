@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI特徵辨識模組</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/identify_styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f9fc;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            padding: 20px;
+            background-color: #4caf50;
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+        .img-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .img-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 45%;
+            text-align: center;
+            position: relative;
+        }
+        .img-section h3 {
+            margin-top: 0;
+        }
+        .img-class {
+            width: 100%;
+            max-height: 400px;
+            border-radius: 10px;
+        }
+        .btn-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .btn-container button {
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        .btn-container button:hover {
+            background-color: #45a049;
+        }
+        .progress-container {
+            width: 50px;
+            height: 350px;
+            background-color: #f3f3f3;
+            border-radius: 25px;
+            position: absolute;
+            top: 50%;
+            left: -90px; /* 左移進度條並增加間距 */
+            transform: translateY(-50%);
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+            flex-direction: column-reverse; /*反向排列，使百分比在底部 */
+        }
+        .progress-bar {
+            width: 100%;
+            height: 0;
+            background-color: #4caf50;
+            text-align: center;
+            color: black;
+            transition: height 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            border-radius: 25px 25px 0 0;
+            flex-direction: column;
+        }
+        .stage-text {
+            text-align: center;
+            background-color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-size: 0.9em;
+            margin-top: 5px; /* 進度條內的間距 */
+        }
+        
+        /* 紅字通知樣式 */
+        .reminder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5em; /* 大字體 */
+            font-weight: bold; /* 加粗 */
+            color: red;
+            display: none;
+            z-index: 100; /* 確保在最上層顯示 */
+            background-color: rgba(255, 255, 255, 0.8); /* 增加背景以保證可讀性 */
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        #recognition-failure {
+            display: none;
+            color: white;
+            background-color: #f44336;
+            border-radius: 5px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: fixed; /* Position it fixed so it stays on the screen */
+            top: 10px; /* Position it near the top */
+            left: 50%;
+            transform: translateX(-50%); /* Center it horizontally */
+            z-index: 1000; /* Make sure it's on top */
+            width: 80%; /* Make it responsive to smaller windows */
+            max-width: 600px; /* Limit the maximum width */
+        }
+
+        #retry-btn {
+            display: none;
+            margin-top: 10px;
+            position: fixed; /* Keep it fixed on screen */
+            top: 80px; /* Slightly below the failure message */
+            left: 50%;
+            transform: translateX(-50%); /* Center it horizontally */
+            z-index: 1000;
+        }
+
+        @media (max-width: 600px) {
+            #recognition-failure, #retry-btn {
+                width: 100%; /* Full width for smaller screens */
+                left: 0;
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>舌診辨識系統</h1>
+        </div>
+        
+        <!-- 辨識區塊 -->
+        <div class="img-container">
+            <div class="img-section animate__animated animate__zoomIn">
+                <!-- 進度條 -->
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar">
+                        <div class="stage-text" id="stage-text">鏡頭開啟中</div>
+                        0%
+                    </div>
+                </div>
+
+                <h3>鏡頭影像辨識</h3>
+                <img src="{{ url_for('video_feed') }}" class="img-class">   
+                <div id="stage-info"></div>
+                <div class="btn-container">
+                    <form action="{{ url_for('result') }}" method="get">
+                        <button type="submit">查看結果</button>
+                    </form>
+                </div>
+                <!-- 20241003 -->
+                <div id="recognition-failure" style="display: none; color: white; background-color: #f44336; border-radius: 5px; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);">
+                    辨識失敗，請按下「再辨識一次」按鈕。
+                </div>
+                <div id="retry-btn" class="btn-container" style="display: none; margin-top: 10px;">
+                    <form action="/tongue_identify_3o" method="get">
+                        <button type="submit" style="padding: 10px 20px; background-color: #4caf50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; transition: background-color 0.3s;" onClick="resetProgressBar()">
+                            再辨識一次
+                        </button>
+                    </form>
+                </div>
+            </div>    
+
+            <div class="img-section animate__animated animate__zoomIn">
+                <h3>吐舌頭範例</h3>
+                <img src="{{ url_for('static', filename='dist/assets/img/tongue-sample2.jpg') }}" class="img-class">    
+                <p>舌診辨識流程<br>如同以上範例圖，雙眼直視前方，並將舌頭吐出。</p> 
+            </div>
+        </div>
+
+
+    <script>
+        // 變數初始化
+        let currentProgress = 0;
+        let targetProgress = 0;
+        const animationDuration = 1000; // 1秒
+        const progressBar = document.getElementById('progress-bar');
+        const stageText = document.getElementById('stage-text');
+        let lastDetectedTime = Date.now();
+        let reminderInterval;
+        let detectionStarted = false;
+    
+        // 更新進度條的函數
+        function updateProgress(stage) {
+            switch (stage) {
+                case "鏡頭開啟中，請參考右方舌診辨識示意圖":
+                    targetProgress = 0;
+                    stageText.innerText = "鏡頭開啟中";
+                    break;
+                case "舌頭辨識中，請依照右邊範例圖示伸長舌頭":
+                    targetProgress = 1;
+                    stageText.innerText = "舌頭辨識中";
+                    lastDetectedTime = Date.now();
+                    if (!detectionStarted) {
+                        detectionStarted = true;
+                        startReminder();
+                    }
+                    break;
+                case "辨識結束，趕緊查看詳細結果吧!":
+                    targetProgress = 100;
+                    stageText.innerText = "完成辨識";
+                    clearInterval(reminderInterval);
+                    detectionStarted = false;
+                    break;
+                default:
+                    if (detectionStarted) {
+                        targetProgress += 1; // 緩慢增加進度
+                        if (targetProgress > 90) targetProgress = 90; // 限制最大進度
+                    }
+                    break;
+            }
+            animateProgress();
+        }
+    
+        // 進度條動畫
+        function animateProgress() {
+            const startTime = performance.now();
+            const startProgress = currentProgress;
+    
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                if (elapsed < animationDuration) {
+                    currentProgress = startProgress + (targetProgress - startProgress) * (elapsed / animationDuration);
+                    progressBar.style.height = currentProgress + '%';
+                    progressBar.innerText = Math.round(currentProgress) + '%';
+                    requestAnimationFrame(step);
+                } else {
+                    currentProgress = targetProgress;
+                    progressBar.style.height = currentProgress + '%';
+                    progressBar.innerText = Math.round(currentProgress) + '%';
+                }
+            }
+    
+            requestAnimationFrame(step);
+        }
+    
+        // 重置進度條和辨識狀態
+        function resetProgressBar() {
+            currentProgress = 0;
+            targetProgress = 0;
+            progressBar.style.height = '0%';
+            progressBar.innerText = '0%';
+            stageText.innerText = '鏡頭開啟中';
+    
+            clearInterval(reminderInterval);
+            detectionStarted = false;
+            startReminder();
+            getStageInfo(); // 重新取得最新辨識階段
+        }
+    
+        // 獲取階段資訊
+        function getStageInfo() {
+            $.ajax({
+                url: '/get_stage_info',
+                type: 'GET',
+                success: function(response) {
+                    const stageInfo = response.stage;
+                    $('#stage-info').text(stageInfo);
+                    updateProgress(stageInfo);
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+    
+        // 顯示提醒
+        function startReminder() {
+            clearInterval(reminderInterval);
+            reminderInterval = setInterval(() => {
+                showReminder();
+                setTimeout(() => {
+                    hideReminder();
+                }, 2000); // 顯示2秒後消失
+            }, 10000); // 每10秒觸發一次
+        }
+    
+        function showReminder() {
+            const reminder = document.getElementById('reminder');
+            reminder.style.display = 'block'; // 顯示通知
+        }
+    
+        function hideReminder() {
+            const reminder = document.getElementById('reminder');
+            reminder.style.display = 'none'; // 隱藏通知
+        }
+    
+        // 定期更新辨識進度
+        setInterval(getStageInfo, 5000);
+    
+        $(document).ready(function() {
+            // 初次加載隱藏錯誤提示和按鈕
+            $('#recognition-failure').hide();
+            $('#retry-btn').hide();
+    
+            // 檢查影像計數的函數
+            function checkImageCounts() {
+                $.ajax({
+                    url: '/get_image_counts',
+                    type: 'GET',
+                    success: function(response) {
+                        let initialImageCount = response.initial_image_count;
+                        let updatedImageCount = response.updated_image_count;
+                        let recognitionStarted = response.recognition_started;
+    
+                        if (recognitionStarted) {
+                            if (updatedImageCount <= initialImageCount) {
+                                $('#recognition-failure').show();
+                                $('#retry-btn').show();
+                            } else {
+                                $('#recognition-failure').hide();
+                                $('#retry-btn').hide();
+                            }
+                        } else {
+                            $('#recognition-failure').hide();
+                            $('#retry-btn').hide();
+                        }
+                    },
+                    error: function(error) {
+                        console.error('Error checking image counts:', error);
+                    }
+                });
+            }
+    
+            // 每5秒檢查一次影像計數
+            setInterval(checkImageCounts, 5000);
+        });
+    </script>
+        
+</body>
+</html>

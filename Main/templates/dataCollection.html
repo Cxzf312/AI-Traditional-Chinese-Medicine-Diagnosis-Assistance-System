@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>辨識可靠度佐證端</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: "Noto Serif TC", serif;
+            background-color: #f8f5ec;
+            color: #4d4d4d;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1, h2, h3 {
+            color: #8b4513;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #a0522d;
+            padding-bottom: 10px;
+        }
+
+        .overall-stats {
+            margin-bottom: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #8b4513;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .image-item {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .image-item:hover {
+            transform: scale(1.05);
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .image-info {
+            padding: 15px;
+        }
+
+        .image-info h3 {
+            margin-top: 0;
+            font-size: 1.2em;
+        }
+
+        .accuracy {
+            font-weight: bold;
+            color: #8b4513;
+        }
+
+        #details {
+            display: none;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            padding: 20px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .details-image {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        #doctorChart {
+            width: 100%;
+            height: 100%;
+        }
+
+        .back-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #8b4513;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: #a0522d;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>辨識可靠度佐證端</h1>
+        <div class="overall-stats">
+            <div style="display: flex; justify-content: center; gap: 40px;">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalAccuracy">0%</div>
+                    <div class="stat-label">系統整體準確度</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalImages">0</div>
+                    <div class="stat-label">總診斷圖片數</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalDoctors">0</div>
+                    <div class="stat-label">參與診斷醫師數</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="image-grid" id="image-grid">
+            <!-- 動態生成圖片列表 -->
+        </div>
+
+        <div id="details">
+            <div class="details-grid">
+                <div>
+                    <h2>AI 辨識結果</h2>
+                    <img id="details-image" class="details-image" src="" alt="舌象圖片">
+                    <p id="ai-result"></p>
+                    <p id="ai-accuracy"></p>
+                    <div id="ai-suggestion"></div>
+                </div>
+                <div>
+                    <h2>醫師診斷結果</h2>
+                    <p id="doctor-count"></p>
+                    <table id="doctor-table">
+                        <thead>
+                            <tr>
+                                <th>醫師</th>
+                                <th>醫院</th>
+                                <th>診斷舌象</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 動態填充醫師診斷結果 -->
+                        </tbody>
+                    </table>
+                    <div class="chart-container">
+                        <canvas id="doctorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <button class="back-btn" onclick="goBack()">返回主頁面</button>
+        </div>
+    </div>
+
+    <script>
+        let doctorData = [];
+        let aiData = [];
+        let doctorChart = null;
+
+        const tongueColors = {
+            '相符': '#66CC66',
+            '其他舌象': '#FF6B6B'
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('./static/dist/json/doctorSide_list.json')
+                .then(response => response.json())
+                .then(data => {
+                    doctorData = data;
+                    return fetch('./static/dist/json/data.json');
+                })
+                .then(response => response.json())
+                .then(data => {
+                    aiData = data;
+                    calculateOverallStats();
+                    displayImages();
+                })
+                .catch(error => console.error('載入 JSON 檔案時出錯:', error));
+
+            function calculateOverallStats() {
+                const uniqueImages = [...new Set(doctorData.map(item => item.imgPath))];
+                let totalAccuracy = 0;
+                
+                uniqueImages.forEach(img => {
+                    const aiMatch = aiData.find(item => item.YoloImg === img);
+                    const aiTongueType = aiMatch ? aiMatch["舌象名稱"] : "未知";
+                    const relevantData = doctorData.filter(item => item.imgPath === img);
+                    const accuracy = calculateAccuracy(relevantData, aiTongueType);
+                    totalAccuracy += accuracy;
+                });
+
+                const averageAccuracy = totalAccuracy / uniqueImages.length;
+                const uniqueDoctors = new Set(doctorData.map(item => item.doctorName));
+
+                document.getElementById('totalAccuracy').textContent = `${averageAccuracy.toFixed(2)}%`;
+                document.getElementById('totalImages').textContent = uniqueImages.length;
+                document.getElementById('totalDoctors').textContent = uniqueDoctors.size;
+            }
+
+            function displayImages() {
+                const imageGrid = document.getElementById('image-grid');
+                const uniqueImages = [...new Set(doctorData.map(item => item.imgPath))];
+                uniqueImages.forEach(img => {
+                    const aiMatch = aiData.find(item => item.YoloImg === img);
+                    const aiTongueType = aiMatch ? aiMatch["舌象名稱"] : "未知";
+                    const relevantData = doctorData.filter(item => item.imgPath === img);
+                    const accuracy = calculateAccuracy(relevantData, aiTongueType);
+
+                    const imageItem = document.createElement('div');
+                    imageItem.className = 'image-item';
+                    imageItem.innerHTML = `
+                        <img src="${img}" alt="Yolo Image">
+                        <div class="image-info">
+                            <h3>AI 辨識舌象：${aiTongueType}</h3>
+                            <p class="accuracy">準確度：${accuracy.toFixed(2)}%</p>
+                            <p>醫師診斷數：${relevantData.length}</p>
+                        </div>
+                    `;
+                    imageItem.onclick = () => showDetails(img);
+                    imageGrid.appendChild(imageItem);
+                });
+            }
+
+            function calculateAccuracy(relevantData, aiTongueType) {
+                const matchCount = relevantData.filter(item => item.tongueType === aiTongueType).length;
+                return (matchCount / relevantData.length) * 100;
+            }
+
+            window.showDetails = function(img) {
+                document.getElementById('image-grid').style.display = 'none';
+                document.getElementById('details').style.display = 'block';
+                document.getElementById('details-image').src = img;
+
+                const aiMatch = aiData.find(item => item.YoloImg === img);
+                const aiTongueType = aiMatch ? aiMatch["舌象名稱"] : "未知";
+                const relevantData = doctorData.filter(item => item.imgPath === img);
+                const accuracy = calculateAccuracy(relevantData, aiTongueType);
+
+                updateAIAnalysis(aiTongueType, accuracy);
+                updateDoctorAnalysis(relevantData, aiTongueType);
+                updateChart(relevantData, aiTongueType);
+            }
+
+            window.goBack = function() {
+                document.getElementById('image-grid').style.display = 'grid';
+                document.getElementById('details').style.display = 'none';
+            }
+
+            function updateAIAnalysis(aiTongueType, accuracy) {
+                const aiResultElem = document.getElementById('ai-result');
+                const aiAccuracyElem = document.getElementById('ai-accuracy');
+                const aiSuggestionElem = document.getElementById('ai-suggestion');
+
+                aiResultElem.textContent = `AI 辨識舌象：${aiTongueType}`;
+                aiAccuracyElem.textContent = `準確度：${accuracy.toFixed(2)}%`;
+
+                let suggestion = '';
+                switch(aiTongueType) {
+                    case '陽虛舌象':
+                        suggestion = '建議您及時就醫,尋求中醫師的專業診斷和治療。可以考慮服用一些溫陽補氣的中藥,如桂枝湯或附子理中湯。';
+                        break;
+                    case '陰虛舌象':
+                        suggestion = '建議您盡快就醫,讓中醫師進行詳細診斷。可以考慮服用一些滋陰潤燥的中藥,如六味地黃丸或知柏地黃丸。';
+                        break;
+                    case '濕熱舌象':
+                        suggestion = '建議您及時就醫,尋求中醫師的專業診斷。可以考慮服用一些清熱利濕的中藥,如龍膽瀉肝湯或茵陳蒿湯。';
+                        break;
+                    case '氣虛舌象':
+                        suggestion = '建議您盡快就醫,讓中醫師進行詳細診斷。可以考慮服用一些補氣的中藥,如四君子湯或補中益氣湯。';
+                        break;
+                    case '健康舌象':
+                        suggestion = '恭喜你，你的舌象顯示健康狀態良好。建議繼續保持良好的生活習慣。';
+                        break;
+                    default:
+                        suggestion = '建議您諮詢專業中醫師以獲得更準確的診斷和建議。';
+                        break;
+                }
+
+                aiSuggestionElem.innerHTML = `
+                    <p><strong>建議：</strong>${suggestion}</p>
+                    <p><em>注意：AI辨識結果僅供參考,請以專業醫師的診斷為準。</em></p>`;
+            }
+
+            function updateDoctorAnalysis(relevantData, aiTongueType) {
+                const doctorCountElem = document.getElementById('doctor-count');
+                const doctorTableBody = document.querySelector('#doctor-table tbody');
+
+                doctorCountElem.textContent = `共有 ${relevantData.length} 位醫師進行診斷`;
+
+                doctorTableBody.innerHTML = '';
+                relevantData.forEach(item => {
+                    const row = doctorTableBody.insertRow();
+                    row.insertCell(0).textContent = item.doctorName;
+                    row.insertCell(1).textContent = item.hospitalName;
+                    const tongueCell = row.insertCell(2);
+                    tongueCell.textContent = item.tongueType;
+                    tongueCell.style.color = item.tongueType === aiTongueType ? 'green' : 'red';
+                });
+            }
+
+            function updateChart(relevantData, aiTongueType) {
+                if (doctorChart) doctorChart.destroy();
+
+                const doctorCtx = document.getElementById('doctorChart').getContext('2d');
+
+                const doctorResults = {
+                    '相符': relevantData.filter(item => item.tongueType === aiTongueType).length,
+                    '其他舌象': relevantData.filter(item => item.tongueType !== aiTongueType).length
+                };
+
+                const chartData = {
+                    labels: Object.keys(doctorResults),
+                    datasets: [{
+                        data: Object.values(doctorResults),
+                        backgroundColor: Object.keys(doctorResults).map(key => tongueColors[key])
+                    }]
+                };
+
+                const options = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '醫師診斷結果統計',
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                };
+
+                doctorChart = new Chart(doctorCtx, {
+                    type: 'pie',
+                    data: chartData,
+                    options: options
+                });
+            }
+        });
+    </script>
+</body>
+</html>

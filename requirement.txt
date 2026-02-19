@@ -1,0 +1,1 @@
+1. 要先commit到github上再壓縮

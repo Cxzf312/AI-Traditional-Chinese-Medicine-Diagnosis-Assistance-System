@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>舌診報告</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #2c3e50;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            padding: 2vw;
+            box-sizing: border-box;
+        }
+        .image-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2vw;
+        }
+        .image-container {
+            width: 100%;
+            height: 60%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .report-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2vw;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        h1 {
+            color: #3498db;
+            text-align: center;
+            font-size: 2vw;
+            margin: 0 0 2vw 0;
+        }
+        .report-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5vw;
+        }
+        .result-item {
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 1vw;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-item h3 {
+            color: #2c3e50;
+            margin: 0 0 0.5vw 0;
+            font-size: 1.3vw;
+        }
+        .result-item p {
+            margin: 0;
+            font-size: 1.1vw;
+            line-height: 1.4;
+            color: #34495e;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 1vw;
+            margin-top: 2vw;
+        }
+        .btn {
+            padding: 0.8vw 1.5vw;
+            font-size: 1vw;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }   
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 500px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+        font-weight: bold;
+        }
+        .close:hover, .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .modal-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .modal-buttons button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 80%;
+            max-width: 250px;
+        }
+        .modal-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .tooltip {                                  /* 解釋視窗 */
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 500px; 
+            background-color: #555; 
+            color: #fff; 
+            text-align: left; 
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px; 
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+            border: 1px solid #cccccc; 
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #ffffff transparent transparent transparent;
+        }
+        .tooltip i {
+            color: #3498db;
+            font-size: 1em;
+            vertical-align: middle;
+        }
+
+        .tooltip:hover i {
+            color: #2980b9;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 300px;
+            background-color: #fff;
+            color: #333;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            border: 1px solid #cccccc;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="image-section">
+            <h1>舌診報告</h1>
+            <div class="image-container">
+                <img src="{{ img_url }}" alt="舌診圖片">
+            </div>
+        </div>
+        <div class="report-section">
+            <div class="report-content">
+                <div class="result-item">
+                    <h3>辨識結果
+                        <span class="tooltip"><i class="fas fa-circle-info"></i>
+                            <span class="tooltiptext">辨識結果是基於您的舌頭照片，經過本系統分析後得出的診斷。這個結果反映了您舌頭的整體特徵和可能的健康狀況。可以透過點擊舌象完整介紹的超連結以查看該舌象的完整介紹</span>
+                        </span>
+                    </h3>
+                    <p>「{{ tongueManifestation_str }}」
+                        {% if linkJSON["連結"] %}
+                            <a href="{{ linkJSON['連結'] }}">舌象完整介紹</a>
+                        {% else %}
+                            無相關連結
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="result-item">
+                    <h3>症狀
+                        <span class="tooltip"><i class="fas fa-circle-info"></i>
+                            <span class="tooltiptext">症狀描述了與辨識結果相關的典型體徵。這些症狀是基於中醫理論總結出來的，</span>
+                        </span>
+                    </h3>
+                    <p>{{ symptomJSON }}</p>
+                </div>
+                <div class="result-item">
+                    <h3>健康狀態
+                        <span class="tooltip"><i class="fas fa-circle-info"></i>
+                            <span class="tooltiptext">健康狀態是根據辨識結果和症狀綜合評估得出的。</span>
+                        </span>
+                    </h3>
+                    <p>{{ healthyState_str }}</p>
+                </div>
+                <div class="result-item">
+                    <h3>建議
+                        <span class="tooltip"><i class="fas fa-circle-info"></i>
+                            <span class="tooltiptext">建議是基於辨識結果的調養方式。這些建議旨在改善您的整體健康狀況，可以透過以下超連結連結至相關網站了解調養資訊</span>
+                        </span>
+                    </h3>
+                    <p>調養方式: {{ nursingMethodsJSON | safe }}</p>
+                </div>
+                <div class="result-item">
+                    <h3>信心指數
+                        <span class="tooltip"><i class="fas fa-circle-info"></i>
+                            <span class="tooltiptext">信心指數表示本系統對於舌診結果的確定程度。越高的百分比代表越可信的診斷結果。這個指數是基於系統的機器學習模型和已有的數據分析得出的。</span>
+                        </span>
+                    </h3>
+                    <p>{{ identificationConfidenceIndex }}%</p>
+                </div>
+            </div>
+                   <!--
+        <div class="link-section">
+            <h3>相關連結</h3>
+            <div class="link-grid">
+                <div class="link-item">
+                    <a href="https://zenheart.com.tw/feature_29.php">舌診療法說明</a>
+                </div>
+                <div class="link-item">
+                    <a href="tongueIdentify_Intro">辨識流程介紹</a>
+                </div>
+                <div class="link-item">
+                    <a href="https://yibian.hopto.org/shu/?sid=3988&lc=tw">中醫診斷指南</a>
+                </div>
+                <div class="link-item">
+                    <a href="#" id="tongueIntroLink">舌象介紹說明</a>
+                </div>
+            </div>
+        </div>
+
+        添加模态窗口 
+        <div id="tongueModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>舌象介紹說明</h2>
+                <div class="modal-buttons">
+                    <button onclick="window.location.href='ydts.html'">陽虛舌象</button>
+                    <button onclick="window.location.href='qdbt.html'">氣虛舌象</button>
+                    <button onclick="window.location.href='dhbt.html'">濕熱舌象</button>
+                    <button onclick="window.location.href='yindts.html'">陰虛舌象</button>
+                </div>
+            </div>
+        </div>
+
+        
+    </div>
+
+    <script>
+        var modal = document.getElementById("tongueModal");
+        var link = document.getElementById("tongueIntroLink");
+        var span = document.getElementsByClassName("close")[0];
+
+        link.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }-->
+            <div class="btn-container">
+                <a href="{{ url_for('tongue_identify_3o') }}" class="btn">重新診斷</a>
+                <a href="{{ url_for('index') }}" class="btn">返回主畫面</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

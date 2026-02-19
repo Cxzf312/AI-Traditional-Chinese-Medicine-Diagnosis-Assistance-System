@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>舌診辨識介紹</h1>
+    <h3>歡迎使用我們的舌診辨識系統。<br>
+        我們的系統透過使用者對著鏡頭吐舌頭，然後進行三階段的辨識來分析舌象病徵。<br>
+        首先，我們會判斷此物件是否為舌頭，並且檢查其健康狀態。<br>
+        如果是健康舌頭，我們將生成一份健康辨識報告。<br>
+        如果舌頭有異常，我們會進一步分析其舌象，判斷其不健康的病徵為何種舌象。<br>
+        完成三階段後，系統將結束辨識並生成相應的辨識報告。<br>
+        請在下方開始您的舌診辨識。</h3>
+    <img src="{{ url_for('static', filename='dist/assets/img/tongueIdentifyFchart.png') }}" width="40%">
+    <br>
+    <div class="btn-container">
+        <!-- 按鈕連結到 /result 路由 -->
+        <form action="{{ url_for('tongue_identify') }}" method="get">
+        <button type="submit">點擊按鈕開始使用舌診辨識!</button>
+        </form>
+    </div>
+</body>
+</html>

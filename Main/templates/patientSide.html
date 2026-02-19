@@ -1,0 +1,38 @@
+<!-- 問診病例模組 (病患端畫面) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>問診病例模組 (病患端畫面)</h1>
+    <div id="content"></div>
+
+    <script>
+        // 指定 JSON 檔案的位置
+        const jsonUrl = 'static/dist/json/data.json';
+
+        // 使用 fetch API 讀取 JSON 檔案
+        fetch(jsonUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 處理 JSON 資料
+                const contentDiv = document.getElementById('content');
+                contentDiv.innerHTML = `
+                    <p>健康狀態: ${data.健康狀態}</p>
+                    <p>舌象名稱: ${data.舌象名稱}</p>
+                `;
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    </script>
+</body>
+</html>

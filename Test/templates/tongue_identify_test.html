@@ -1,0 +1,74 @@
+<!-- 辨識流程頁面 -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tongue Identify Test</title>
+    <!-- 跑出第幾階段的輸出 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/identify_styles.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function getStageInfo() {
+                $.ajax({
+                    url: '/get_stage_info',
+                    type: 'GET',
+                    success: function(response) {
+                        $('#stage-info').text(response.stage);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            }
+            // 定時更新辨識階段資訊
+            setInterval(getStageInfo, 1000);
+        });
+    </script>
+</head>
+<body>
+    <div class="main">
+        <div class="header">
+            <h1>舌診辨識</h1> <!-- AI特徵辨識模組-舌頭辨識系統 -->
+        </div>
+        
+        <div class="img-container">
+            <div class="img-section">
+                <h3>webcam辨識</h3>
+                <!-- <img src="{{ url_for('video_feed') }}" class="img-class">   webcam辨識 -->
+                <!-- <div id="stage-info"></div> -->
+                <img src="{{ url_for('video_feed') }}" class="img-class">    
+                <div id="stage-info"></div>  <!-- 跑出第幾階段的輸出 -->
+            </div>
+
+            <div class="img-section">
+                <h3>吐舌頭範例</h3>
+                <img src="{{ url_for('static', filename='dist/assets/img/tongue-sample.jpg') }}" class="img-class">  <!-- 吐舌頭範例 -->     
+                <p>吐舌頭範例<br>像這樣吐舌頭(暫定內容)</p> 
+            </div>
+        </div>
+        <div class="btn-container">
+            <!-- 按鈕連結到 /result 路由 -->
+            <form action="{{ url_for('result') }}" method="get">
+                <button type="submit">查看結果</button>
+            </form>
+            <br>
+            <!-- 健康按鈕 -->
+            <form action="{{ url_for('healthyResult') }}" method="get">
+                <button type="submit">查看健康結果</button>
+            </form>
+            <br>
+            <!-- 不健康按鈕 -->
+            <form action="{{ url_for('unhealthyResult') }}" method="get">
+                <button type="submit">查看不健康結果</button>
+            </form>
+            <br>
+             <!-- 新結果 -->
+             <form action="{{ url_for('newResult') }}" method="get">
+                <button type="submit">查看新結果</button>
+            </form>
+        </div>
+
+    </div>
+
+</body>
+</html>

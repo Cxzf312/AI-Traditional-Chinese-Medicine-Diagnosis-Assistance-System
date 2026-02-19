@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>result</title>
+    <!-- 連結css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/result_styles.css') }}">
+</head>
+<body>
+    <div class="content">
+        <h1>辨識報告</h1>
+
+        <h2>{{healthyState_str}}</h2> <!-- 健康/不健康的字串 -->
+        <!-- <h2>信心指數為{{healthy_identificationConfidenceIndex}}%</h2> -->
+
+        <!-- 判斷有舌象才顯示在網頁上 -->
+        {% if tongueManifestation_str %}
+        <h2>經由辨識這是「{{tongueManifestation_str}}!」</h2> <!-- 舌象名稱 -->
+        <h2>信心指數為{{identificationConfidenceIndex}}%</h2> 
+        {% endif %}
+
+        <img src="{{ img_url }}" alt="辨識圖片">
+
+        <br>
+
+        <div class="btn-container">
+            <!-- 按鈕連結到 /result 路由 -->
+            <form action="{{ url_for('index') }}" method="get">
+            <button type="submit">返回主畫面</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

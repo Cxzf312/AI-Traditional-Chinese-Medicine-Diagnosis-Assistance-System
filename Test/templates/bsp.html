@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recognition System</title>
+</head>
+<body>
+    <div id="stage-info"></div>
+    <img src="{{ url_for('video_feed') }}" width="640" height="480">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function getStageInfo() {
+                $.ajax({
+                    url: '/get_stage_info',
+                    type: 'GET',
+                    success: function(response) {
+                        $('#stage-info').text(response.stage);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            }
+
+            // 定時更新辨識階段資訊
+            setInterval(getStageInfo, 1000);
+        });
+    </script>
+</body>
+</html>

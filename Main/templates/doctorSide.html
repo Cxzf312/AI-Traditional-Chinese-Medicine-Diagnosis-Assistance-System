@@ -1,0 +1,255 @@
+<!-- 中醫師端2.0 (20240708以後版本) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Detected Tongue Images</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e8e8e9; /* 灰色背景 */
+            margin: 0;
+            padding: 20px;
+            overflow: hidden; /* 確保 body 不會滾動 */
+        }
+        .container {
+            max-width: 95%; /* 增加容器寬度 */
+            margin: auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease; /* 添加過渡效果 */
+            overflow: auto; /* 確保容器可以滾動 */
+            height: calc(100vh - 40px); /* 根據視窗高度設置容器高度 */
+        }
+
+        .container:hover {
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* 懸停時增加陰影 */
+        }
+
+        .form-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            overflow: auto; /* 允許表單內容滾動 */
+            max-height: 90vh; /* 限制表單高度 */
+        }
+        .form-popup .form-group {
+            margin-bottom: 15px;
+        }
+        .form-popup label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-popup input, .form-popup select, .form-popup textarea {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-popup button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .form-popup button:hover {
+            background-color: #218838;
+        }
+        .close-btn {
+            background-color: #dc3545;
+            margin-left: 10px;
+        }
+        .close-btn:hover {
+            background-color: #c82333;
+        }
+        .btn-container {
+            margin-top: 20px;
+        }
+        .data-table-container {
+            max-height: 70vh; /* 設定最大高度 */
+            overflow: auto; /* 垂直滾動 */
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        .data-table th {
+            background-color: #f9f9f9;
+        }
+        .data-table button {
+            padding: 10px 20px; /* 按鈕內邊距 */
+            background-color: #183f2d; /* 按鈕背景顏色 */
+            color: #fff; /* 按鈕文字顏色 */
+            border: none; /* 去掉邊框 */
+            border-radius: 5px; /* 邊角圓滑 */
+            cursor: pointer; /* 鼠標指針樣式 */
+            font-size: 16px; /* 文字大小 */
+        }
+
+        .data-table button:hover {
+            background-color: #218838; /* 懸停時背景顏色 */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>歷史辨識結果</h1>
+    <div class="data-table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>辨識到的照片</th>
+                    <th>醫院名稱</th>
+                    <th>醫師名字（ID）</th>
+                    <th>填寫時間</th>
+                    <th>舌象</th>
+                    <th>辨識準確度</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="dataTableBody">
+                <!-- 表格内容会通过 JavaScript 动态插入 -->
+                {% for img_path in tongue_images.tongue_yolo_img %}
+                    <tr>
+                        <td><img src="{{ img_path }}" alt="Detected Tongue Image" style="width: 100px; height: auto;"></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><button type="button" onclick="openForm('{{ img_path }}')">填寫報告</button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="form-popup" id="formPopup">
+    <form id="selectionForm">
+        <h2>辨識報告</h2>
+        <div class="form-group">
+            <label for="detectedImage">辨識到的照片</label>
+            <img id="detectedImage" src="" alt="Detected Tongue Image" style="width: 100%; height: auto;">
+            <input type="hidden" id="imgPath" name="imgPath">
+        </div>
+        <div class="form-group">
+            <label for="hospitalName">醫院名稱</label>
+            <input type="text" id="hospitalName" name="hospitalName" required>
+        </div>
+        <div class="form-group">
+            <label for="doctorName">醫師名字（ID）</label>
+            <input type="text" id="doctorName" name="doctorName" required>
+        </div>
+        <div class="form-group">
+            <label for="timestamp">填寫時間</label>
+            <input type="text" id="timestamp" name="timestamp" readonly>
+        </div>
+        <div class="form-group">
+            <label for="tongueType">舌象</label>
+            <select id="tongueType" name="tongueType" required>
+                <option value="正常">正常</option>
+                <option value="陽虛">陽虛</option>
+                <option value="氣虛">氣虛</option>
+                <option value="陰虛">陰虛</option>
+                <option value="濕熱">濕熱</option>
+                <!-- 其他選項可以根據需要添加 -->
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="accuracy">辨識準確度</label>
+            <select id="accuracy" name="accuracy" required>
+                <option value="高">高</option>
+                <option value="中">中</option>
+                <option value="低">低</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="suggestions">建議或改善</label>
+            <textarea id="suggestions" name="suggestions" rows="4" required></textarea>
+        </div>
+        <div class="btn-container">
+            <button type="submit">提交</button>
+            <button type="button" class="close-btn" onclick="closeForm()">取消</button>
+        </div>
+    </form>
+</div>
+
+
+<script>
+    function openForm(imgPath) {
+        document.getElementById('detectedImage').src = imgPath;
+        document.getElementById('imgPath').value = imgPath;
+        document.getElementById('timestamp').value = new Date().toLocaleString();
+        document.getElementById('formPopup').style.display = 'block';
+    }
+
+    function closeForm() {
+        document.getElementById('formPopup').style.display = 'none';
+    }
+
+    document.getElementById('selectionForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var formData = new FormData(this);
+
+        fetch('/submit-form', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('提交成功');
+                closeForm();
+
+                // 动态更新表格内容
+                const tableBody = document.getElementById('dataTableBody');
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td><img src="${formData.get('imgPath')}" alt="Detected Tongue Image" style="width: 100px; height: auto;"></td>
+                    <td>${formData.get('hospitalName')}</td>
+                    <td>${formData.get('doctorName')}</td>
+                    <td>${formData.get('timestamp')}</td>
+                    <td>${formData.get('tongueType')}</td>
+                    <td>${formData.get('accuracy')}</td>
+                    <td><button type="button" onclick="openForm('${formData.get('imgPath')}')">填寫報告</button></td>
+                `;
+                tableBody.appendChild(newRow);
+            } else {
+                alert('提交失败');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('提交失败');
+        });
+    });
+</script>
+
+
+</body>
+</html>

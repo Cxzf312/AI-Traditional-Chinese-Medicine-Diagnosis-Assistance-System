@@ -1,0 +1,62 @@
+<!-- 辨識流程頁面 -->
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>AI特徵辨識模組</title>
+    <!-- 跑出第幾階段的輸出 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/identify_styles.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function getStageInfo() {
+                $.ajax({
+                    url: '/get_stage_info',
+                    type: 'GET',
+                    success: function(response) {
+                        $('#stage-info').text(response.stage);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            }
+            // 定時更新辨識階段資訊
+            setInterval(getStageInfo, 1000);
+        });
+    </script>
+</head>
+<body>
+    <div class="main">
+        <div class="header">
+            <h1>舌頭辨識系統</h1>
+        </div>
+        
+        <div class="img-container">
+            <div class="img-section">
+                <h3>Webcam辨識</h3>
+                <img src="{{ url_for('video_feed') }}" class="img-class">   
+                <div id="stage-info"></div>
+                <div class="btn-container">
+                    <form action="{{ url_for('result') }}" method="get">
+                        <button type="submit">查看結果</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="img-section">
+                <h3>吐舌頭範例</h3>
+                <img src="{{ url_for('static', filename='dist/assets/img/tongue-sample.jpg') }}" class="img-class">    
+                <p>舌診辨識流程<br>如同以上範例圖，雙眼直視前方，並將舌頭吐出。</p> 
+            </div>
+        </div>
+
+        <!-- debug用 -->
+        <div class="btn-container">
+            <form action="{{ url_for('resultPic') }}" method="get">
+                <button type="submit">查看結果(debug用)</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

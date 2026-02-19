@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>陽虛舌象介紹</title>
+        <style>
+            body {
+                font-family: 'Microsoft JhengHei', Arial, sans-serif;
+                line-height: 1.8;
+                color: #333;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f0f0f0;
+                font-size: 22px; 
+            }
+            .container {
+                display: flex;
+                background-color: white;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                overflow: hidden;
+                padding: 20px;
+            }
+            .image-container {
+                flex: 1;
+                padding-right: 20px; 
+            }
+            .image-container img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 10px;
+            }
+            .content {
+                flex: 2;
+            }
+            .content h1 {
+                color: #2c3e50;
+                border-bottom: 2px solid #3498db;
+                padding-bottom: 10px;
+                font-size: 36px;
+            }
+            h2 {
+                color: #3498db;
+                font-size: 28px;
+                margin-bottom: 10px;
+            }
+            p, li {
+                font-size: 22px;
+            }
+            ul {
+                margin-left: 20px;
+            }
+            .back-button {
+                display: inline-block;
+                margin-top: 30px;
+                padding: 12px 25px;
+                background-color: #3498db;
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+                transition: background-color 0.3s;
+                font-size: 20px; 
+            }
+            .back-button:hover {
+                background-color: #2980b9;
+            }
+            .section {
+                margin-top: 20px;
+            }
+        </style>
+    </head>
+<body>
+    <div class="container">
+        <div class="image-container">
+            <img src="{{ url_for('static', filename='dist/assets/img/ydts.png') }}" alt="陽虛舌象圖片">
+        </div>
+        <div class="content">
+            <h1>陽虛舌象</h1>
+            <p>陽虛舌象是中醫診斷中的一種重要舌象，反映人體陽氣不足的狀態，通常表現為舌質淡白、舌苔白滑等。</p>
+            
+            <div class="section">
+                <h2>舌象特徵</h2>
+                <ul>
+                    <li>舌體胖大、嫩白或淡白</li>
+                    <li>舌苔白滑或水滑</li>
+                    <li>舌質淡白、舌體虛腫</li>
+                    <li>舌邊有齒痕</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>病症與身體狀況</h2>
+                <p>陽虛舌象反映了以下身體狀況：</p>
+                <ul>
+                    <li>脾陽虛：消化功能減弱，食慾不振，腹部脹滿感</li>
+                    <li>腎陽虛：畏寒怕冷，腰膝酸軟，夜尿多</li>
+                    <li>心陽虛：心悸、胸悶、氣短，情緒低落</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>應對對策與調養方式</h2>
+                <p>針對陽虛舌象，中醫建議以下調養方式來補充陽氣：</p>
+                <ul>
+                    <li><strong>飲食調養</strong>：多吃溫熱食物，如薑湯、羊肉、韭菜，避免生冷食物。</li>
+                    <li><strong>生活方式</strong>：注意保暖，避免長時間處於寒冷環境，適度運動以促進血液循環。</li>
+                    <li><strong>中藥調理</strong>：可在醫師指導下服用溫陽補氣的中藥，如四逆湯、真武湯等。</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>注意事項</h2>
+                <p>陽虛體質者應該注意以下事項：</p>
+                <ul>
+                    <li>避免過度疲勞，注意適當休息。</li>
+                    <li>防止受寒，尤其在冬季應穿著保暖。</li>
+                    <li>保持積極心態，情緒穩定，避免長期壓力。</li>
+                </ul>
+            </div>
+
+            <a href="{{ url_for('result') }}" class="back-button">返回</a>
+        </div>
+    </div>
+</body>
+</html>
