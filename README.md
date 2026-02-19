@@ -8,6 +8,5 @@ TCM tongue diagnosis system using YOLOv8
 - Python、YOLOv8、Flask
 
 ## 如何執行
-pip install -r requirement.txt
 
 python app.py
